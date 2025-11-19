@@ -68,14 +68,19 @@ export function init(scene, size, id, offset, texture) {
                 uvs.array[i+2] = topUvE;
             }
         }
+
         const bldg = new THREE.Mesh(
             geometry,
             material
         )
-        bldg.position.set(offset.x, -0.01, offset.z);
+        bldg.position.set(offset.x+x, bldgH/2, offset.z+z);
         scene.add(bldg);
     }
-    makeBuilding(20, 20, 0);
+    makeBuilding(30, 30, 0);
+    makeBuilding(10, 30, 0);
+    makeBuilding(30, 40, 0);
+    makeBuilding(10, 3, 0);
+    makeBuilding(500, 50, 0);
 
     // コース(描画)
     // 制御点を補間して曲線を作る
