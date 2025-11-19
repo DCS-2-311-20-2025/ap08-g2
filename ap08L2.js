@@ -18,37 +18,58 @@ let camera;
 let course;
 export const origin = new THREE.Vector3();
 export const controlPoints = [
-    [ 50,-20],
+    [50, -20],
+    [5, 0],
+    [-20, 20],
     [-25, 40]
 ]
 export function init(scene, size, id, offset, texture) {
     origin.set(offset.x, 0, offset.z);
     camera = new THREE.PerspectiveCamera(20, 1, 0.1, 1000);
     {
-      camera.position.set(0, 10, 0);
-      camera.lookAt(offset.x, 0, offset.z);
+        camera.position.set(0, 10, 0);
+        camera.lookAt(offset.x, 0, offset.z);
     }
-    renderer =  new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer();
     {
-      renderer.setClearColor(0x406080);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(size, size);
+        renderer.setClearColor(0x406080);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(size, size);
     }
     document.getElementById(id).appendChild(renderer.domElement);
-    
+
     // 平面
     const plane = new THREE.Mesh(
         new THREE.PlaneGeometry(100, 80),
-        new THREE.MeshLambertMaterial({color: "green"})
+        new THREE.MeshLambertMaterial({ color: "green" })
     )
-    plane.rotateX(-Math.PI/2);
+    plane.rotateX(-Math.PI / 2);
     plane.position.set(offset.x, -0.01, offset.z);
     scene.add(plane);
 
     // ビル
 
     // コース(描画)
-
+    course = new THREE.CatmullRomCurve3(
+        controlPoints.map((p) => {
+            return (new THREE.Vector3()).set(
+                offset.x + p[0],
+                0,
+                offset.z + p[1]
+            );
+        }), false
+    )
+    // 100所を取り出す
+    const points = course.getPoints(100);
+    points.forEach((point) => {
+        const road = new THREE.Mesh(
+            new THREE.CircleGeometry(5, 16),
+            new THREE.MeshLambertMaterial({ color: "gray" })
+        )
+        road.rotateX(-Math.PI / 2);
+        road.position.set(point.x, 0, point.z);
+        scene.add(road);
+    })
 }
 
 // コース(自動運転用)
@@ -62,6 +83,10 @@ export function getCamera() {
 
 // 車の設定
 export function setCar(scene, car) {
+    const SCALE = 0.01;
+    car.position.copy(origin);
+    car.scale.set(SCALE, SCALE, SCALE);
+    scene.add(car);
 }
 
 // Windowサイズの変更処理
